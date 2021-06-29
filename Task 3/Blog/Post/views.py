@@ -81,9 +81,11 @@ class CreatePost(CreateView):
     fields = '__all__'
 
     def get(self, request, *args, **kwargs):
-        form = PostForm(request.POST)
-        context = {'form': form}
-        return render(request, 'Post/create_post.html', context)
+        if request.user.is_authenticated:
+            form = PostForm(request.POST)
+            context = {'form': form}
+            return render(request, 'Post/create_post.html', context)
+        return redirect('home')
 
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST, request.FILES)
@@ -98,3 +100,13 @@ class CreatePost(CreateView):
             new_post.save()
             return redirect('home')
         return render(request, 'Post/create_post.html', {'form': form})
+
+
+class DeletePost(View):
+    """Delete posts on platform by superuser."""
+    def get(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            post_pk = kwargs.get('pk')
+            post = UserPost.objects.get(pk=post_pk)
+            post.delete()
+        return redirect('home')
