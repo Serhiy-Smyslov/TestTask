@@ -29,11 +29,12 @@
                 {{post.content}}
             </div>
         </div>
-        {% if request.user.is_authenticated %}
             {% if request.user.is_superuser %}
-                <a href="{% url 'delete_post' pk=post.pk %}" class="btn btn-danger m-auto mt-3 mb-3">Delete post</a>
+                <a href="{% url 'delete_post' pk=post.pk %}" class="btn btn-danger m-3 ">Delete post</a>
             {% endif %}
-        {% endif %}
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'update_post' pk=post.pk %}" class="btn btn-primary m-3">Update post</a>
+            {% endif %}
     </div>
 
 {% endblock %}

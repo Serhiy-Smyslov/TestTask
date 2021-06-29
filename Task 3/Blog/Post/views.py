@@ -1,8 +1,6 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.views.generic import DetailView, View, CreateView
-from django.contrib.auth.decorators import login_required
+from django.views.generic import DetailView, View, CreateView, UpdateView, DeleteView
 
 from .models import UserPost, SimpleUser
 from .forms import PostForm, LoginForm, RegistrationForm
@@ -102,7 +100,30 @@ class CreatePost(CreateView):
         return render(request, 'Post/create_post.html', {'form': form})
 
 
-class DeletePost(View):
+class UpdatePost(UpdateView):
+    """Update posts on platform by user."""
+    template_name = 'Post/update_post.html'
+    fields = ('title', 'content', 'image')
+
+    def get(self, request, *args, **kwargs):
+        author = SimpleUser.objects.get(user=request.user)
+        post = UserPost.objects.get(pk=kwargs['pk'])
+        if post.author == author:
+            form = PostForm(request.POST, request.FILES, instance=post)
+            context = {'form': form}
+            return render(request, 'Post/update_post.html', context)
+        return redirect('home')
+
+    def post(self, request, *args, **kwargs):
+        post = UserPost.objects.get(pk=kwargs['pk'])
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        return render(request, 'Post/update_post.html', {'form': form})
+
+
+class DeletePost(DeleteView):
     """Delete posts on platform by superuser."""
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
