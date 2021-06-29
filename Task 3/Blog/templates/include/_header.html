@@ -1,0 +1,17 @@
+
+<header class="navigation">
+    <a href="{% url 'home' %}" class="logo">
+        <i class="fas fa-blog"></i>Blog
+    </a>
+
+    <ul class="authorization">
+        {% if not request.user.is_authenticated %}
+        <li><a href="{% url 'registration' %}">Registration</a></li>
+        <li><a href="{% url 'login' %}">Log in</a></li>
+        {% else %}
+        <li><a href="{% url 'create_post' %}">Create Post</a></li>
+        <li>{{request.user.username}}</li>
+        <li><a href="{% url 'logout' %}">Log out</a></li>
+        {% endif %}
+    </ul>
+</header>

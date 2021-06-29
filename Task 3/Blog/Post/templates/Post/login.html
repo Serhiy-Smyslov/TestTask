@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ block.super }} :: Create Post{% endblock %}
+
+{% block content %}
+    <div class="row" style="margin-bottom: 50px; margin-top: 50px">
+        <div class="col-md-12 d-flex justify-content-center">
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" class="btn btn-success mt-3" value="Log in">
+            </form>
+        </div>
+    </div>
+{% endblock %}

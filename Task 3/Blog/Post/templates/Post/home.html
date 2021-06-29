@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="blog-container">
+        {% for post in posts %}
+        <div class="blog-box">
+            <a href="{% url 'post_details' pk=post.pk %}">
+                <div class="blog-img">
+                    <img class="thumbnail" src="{{post.image.url}}">
+                </div>
+            </a>
+
+            <div class="blog-text">
+                <a href="{% url 'post_details' pk=post.pk %}">
+                    <strong>{{post.title}}</strong>
+                </a>
+
+                <div class="category-item">
+                    <span class="published-item">{{post.created_at|date:'D d M Y'}}</span>
+                </div>
+            </div>
+
+            <div class="publisher-profile">
+                <span>{{post.author}}</span>
+            </div>
+        </div>
+        {% empty %}
+        <h2>No posts...</h2>
+        {% endfor %}
+
+    </div>
+{% endblock %}
