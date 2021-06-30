@@ -24,3 +24,13 @@ class UserPost(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    post = models.ForeignKey(UserPost, null=True, blank=True, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
+    content = models.TextField(verbose_name='Content')
+
+    def __str__(self):
+        return self.user.username

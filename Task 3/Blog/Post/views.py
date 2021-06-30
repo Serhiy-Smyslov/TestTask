@@ -1,30 +1,53 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.urls import reverse
 from django.views.generic import DetailView, View, CreateView, UpdateView, DeleteView
 
-from .models import UserPost, SimpleUser
-from .forms import PostForm, LoginForm, RegistrationForm
+from .models import UserPost, SimpleUser, Comment
+from .forms import PostForm, LoginForm, RegistrationForm, CommentForm
 
 
 class HomeView(View):
     """View for home page with all posts."""
+
     def get(self, request, *args, **kwargs):
-     posts = UserPost.objects.all()
-     context = {
-         'posts': posts,
-     }
-     return render(request, 'Post/home.html', context)
+        posts = UserPost.objects.all()
+        context = {
+            'posts': posts,
+        }
+        return render(request, 'Post/home.html', context)
 
 
 class PostView(DetailView):
-    """View with post information."""
+    """View with post information and its comments."""
     model = UserPost
     template_name = 'Post/post.html'
     context_object_name = 'post'
 
+    form = CommentForm
+
+    def post(self, request, *args, **kwargs):
+        form = CommentForm(request.POST or None)
+        if form.is_valid():
+            userpost = self.get_object()
+            form.instance.user = request.user
+            form.instance.post = userpost
+            form.save()
+            return redirect(reverse('post_details',
+                            kwargs={'pk': userpost.pk
+                                    }))
+
+    def get_context_data(self, **kwargs):
+        comments = Comment.objects.all().filter(post=self.get_object())
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form
+        context['comments'] = comments
+        return context
+
 
 class LoginView(View):
     """Log in user on platform."""
+
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST or None)
         context = {'form': form}
@@ -44,6 +67,7 @@ class LoginView(View):
 
 class RegistrationView(View):
     """Registrate user on platform."""
+
     def get(self, request, *args, **kwargs):
         form = RegistrationForm(request.POST or None)
         context = {'form': form}
@@ -125,6 +149,7 @@ class UpdatePost(UpdateView):
 
 class DeletePost(DeleteView):
     """Delete posts on platform by superuser."""
+
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             post_pk = kwargs.get('pk')

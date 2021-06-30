@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ block.super }}::{{ post.title }}{% endblock %}
 
@@ -29,12 +30,40 @@
                 {{post.content}}
             </div>
         </div>
+        <div class="d-flex justify-content-center">
             {% if request.user.is_superuser %}
                 <a href="{% url 'delete_post' pk=post.pk %}" class="btn btn-danger m-3 ">Delete post</a>
             {% endif %}
-            {% if request.user.is_authenticated %}
+            {% if request.user == post.author.user %}
                 <a href="{% url 'update_post' pk=post.pk %}" class="btn btn-primary m-3">Update post</a>
             {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h3 align="center" style="margin: 10px 0;">Users Comments</h3>
+                {% for comment in comments %}
+                <div class="media-list my-3">
+                    <div class="media-body">
+                        <img class="avatar avatar-xs rounded-circle mr-3" style="height: 50px;" src="{% static 'profile.png' %}" alt="user">
+                        <div class="small-1 mt-3">
+                            <strong>User: {{comment.user.username}}</strong>
+                            <time class="ml-4 opacity-70 small-3">{{comment.date|date:'D d M Y'}}</time>
+                        </div>
+                        <p class="mt-2">{{comment.content}}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="mt-4">No comments...</p>
+                {% endfor %}
+                {% if request.user.is_authenticated %}
+                    <form method="POST" action="{% url 'post_details' pk=post.pk %}">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <button class="btn btn-primary btn-block" type="submit">Comment</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 {% endblock %}

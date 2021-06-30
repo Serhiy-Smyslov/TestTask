@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 
-from .models import UserPost
+from .models import UserPost, Comment
 
 
 class PostForm(ModelForm):
@@ -83,3 +83,10 @@ class RegistrationForm(forms.ModelForm):
             'first_name', 'last_name', 'username',
             'email', 'name', 'password', 'confirm_password'
         )
+
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ('content',)

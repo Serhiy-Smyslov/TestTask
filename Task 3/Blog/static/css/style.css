@@ -15,7 +15,11 @@ body{
 a{
     text-decoration: none;
     color: #838eab;
+}
 
+a::hover{
+    text-decoration: none;
+    color: #000000;
 }
 
 ul{
